@@ -10,10 +10,12 @@ bcrypt = Bcrypt(cooksmartapp)
 # Set up the MongoDB client and database
 
 client = MongoClient(
-    "mongodb+srv://savinthie:cookSmart25@cluster0.zg9e7jn.mongodb.net/test")# connected to the cooksmart database using the connection string
-db = client["cooksmart"]#database name
-collection = db["signup_infos"]#collection used to store  user  signup and login information
-collection1 = db['recipeAndIngredientsGenerator']#collection used to retrieve fooditem data
+    "mongodb+srv://savinthie:cookSmart25@cluster0.zg9e7jn.mongodb.net/test")  # connected to the cooksmart database using the connection string
+db = client["cooksmart"]  # database name
+# collection used to store  user  signup and login information
+collection = db["signup_infos"]
+# collection used to retrieve fooditem data
+collection1 = db['recipeAndIngredientsGenerator']
 cooksmartDirectory = 'flask demo/resnet-model-23-02-21.h5'
 cooksmartModel = keras.models.load_model(
     cooksmartDirectory)  # loaded the cooksmart trained model
@@ -138,7 +140,7 @@ allergycount = 0
 p = ""
 
 
-#route for upload image page right after home page
+# route for upload image page right after home page
 @cooksmartapp.route("/submitPrediction", methods=['GET', 'POST'])
 def get_output():
     global p
@@ -160,14 +162,17 @@ def get_output():
         # find the predicted food name in the db
         result = collection1.find_one({'foodName': p})
         recipe = result['Recipe']  # found the recipe for the foodname
-        ingredient = result['ingredients']  # found the ingredient for the foodname
+        # found the ingredient for the foodname
+        ingredient = result['ingredients']
     # return the prediction result to the frontend
     return render_template("recipe.html", prediction=predicted_food_name, recipe=recipe, ing=ingredient)
 
 
 allergy_list = []
 
-#route for allergy selection page right after  recipe and ingredient generation page
+# route for allergy selection page right after  recipe and ingredient generation page
+
+
 @cooksmartapp.route('/allergy_list', methods=['POST'])
 def allergy_list():
     data = request.get_json()
@@ -180,14 +185,14 @@ def allergy_list():
 
     for i in allergy_list:
         global allergycount
-        allergycount=0
+        allergycount = 0
         print(i)
         if (ingredient.find(i) != -1):  # find the index of the user entered allergen
             print("allergen is there")
-            allergycount += 1 #allergy count will be incremented by 1 if allergy an allergy is detected
+            allergycount += 1  # allergy count will be incremented by 1 if allergy an allergy is detected
             print(allergycount)
         else:
-            allergycount == 0 #allergy count will be 0 if allergy is not detected
+            allergycount == 0  # allergy count will be 0 if allergy is not detected
             print("allergen is not there")
 
     return render_template("notification.html")
@@ -196,16 +201,16 @@ def allergy_list():
 message = ""
 
 
-#route for allergy notification page right after  allergy selection page
+# route for allergy notification page right after  allergy selection page
 @cooksmartapp.route("/allergyNotification")
 def viewnew():
     global message
-    print('allergycount',allergycount)
+    print('allergycount', allergycount)
     if (allergycount > 0):
-        message = "Yes"#if allergy count is 1 or more the allergy detected message will be set
+        message = "Yes"  # if allergy count is 1 or more the allergy detected message will be set
 
     else:
-        message = "None"#if allergy count is 0  allergy not detected message will be set
+        message = "None"  # if allergy count is 0  allergy not detected message will be set
 
     return render_template("notification.html", message=message)
 
@@ -221,12 +226,16 @@ def predictionPage():
 
 # signup and  login
 
-#route for presentation page
+# route for presentation page
+
+
 @cooksmartapp.route("/")
 def index():
     return render_template("index.html")
 
-#route for signup page  right after presentation page
+# route for signup page  right after presentation page
+
+
 @cooksmartapp.route("/submit", methods=["POST"])
 def submit():
     # Get the data from the request
@@ -248,24 +257,28 @@ def submit():
     # Redirect to the success page
     return redirect('/home')
 
-#route to signup page
+# route to signup page
+
+
 @cooksmartapp.route('/signup')
 def signupfun():
     return render_template('signup.html')
 
 
-#route to image uploader page,right after login or signup page
+# route to image uploader page,right after login or signup page
 @cooksmartapp.route('/home')
 def home():
     return render_template('home.html')
 
 
-#route to login page, right after presentation page
+# route to login page, right after presentation page
 @cooksmartapp.route('/login')
 def another_page():
     return render_template('login.html')
 
-#route to  signup detail submit 
+# route to  signup detail submit
+
+
 @cooksmartapp.route("/submit_login", methods=["POST"])
 def submit_login():
     # Get the data from the request
@@ -289,4 +302,4 @@ def submit_login():
 
 
 if __name__ == "__main__":
-    cooksmartapp.run(debug=True)
+    cooksmartapp.run(debug=False, host="0.0.0.0")
